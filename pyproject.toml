@@ -34,8 +34,3 @@ where = ["src"]
 [project.scripts]
 spamdet-train = "spam_detector.cli:train_main"
 spamdet-predict = "spam_detector.cli:predict_main"
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-addopts = "-q --cov=spam_detector --cov-report=term-missing"
-testpaths = ["tests"]
