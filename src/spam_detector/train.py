@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
 
 import numpy as np
 from sklearn.metrics import log_loss
@@ -71,11 +70,7 @@ def _sgd_train_with_epochs(
     split: SplitData,
     *,
     epochs: int = 12,
-) -> tuple[Pipeline, list[float]]:
-    """
-    Тренира SGDClassifier итеративно и записва val log_loss за всяка “епоха”.
-    Това покрива изискването: loss curve per epoch.
-    """
+) -> tuple[Pipeline, list[float]]:    
     pipe = build_pipeline(cfg, kind="sgd")
     tfidf = pipe.named_steps["tfidf"]
     clf = pipe.named_steps["clf"]

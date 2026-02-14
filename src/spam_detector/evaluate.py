@@ -31,8 +31,8 @@ def evaluate_model(model: Pipeline, texts: list[str], labels: list[str]) -> Eval
 
 def evaluate_from_files(model_path: str | Path, data_csv: str | Path) -> EvalResult:
     model = load_model(str(model_path))
-    ds = load_dataset(data_csv)
-    X_train, X_test, y_train, y_test = train_test_split(
+    ds = load_dataset(Path(data_csv))
+    X_test, y_test = train_test_split(
         ds.texts, ds.labels, test_size=0.2, random_state=42, stratify=ds.labels
     )
     return evaluate_model(model, X_test, y_test)

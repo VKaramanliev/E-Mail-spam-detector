@@ -13,7 +13,7 @@ from spam_detector.data import load_dataset
 from spam_detector.evaluate import evaluate_model, format_evaluation, save_text_report
 from spam_detector.models import ModelKind, TrainConfig, load_model, predict_label, save_model
 from spam_detector.plots import save_reports
-from spam_detector.train import train_all_models, train_model
+from spam_detector.train import train_all_models, train_model, split_train_val_test
 
 
 def _default_model_path(kind: str) -> Path:
@@ -139,7 +139,7 @@ def main() -> None:
         st.subheader("Обучение и оценка (train/val/test)")
 
         with st.expander("Обучи избрания модел и запази", expanded=True):
-            st.write("Обучава върху TRAIN, мери върху VAL, и връща и TEST метрики (test set е отделен!).")
+            st.write("Обучава върху TRAIN, мери върху VAL и връща TEST метрики (test set е отделен!).")
             if st.button("Train selected model", use_container_width=True):
                 try:
                     ds = load_dataset(resolved_csv_path)
@@ -219,10 +219,19 @@ def main() -> None:
                 else:
                     try:
                         ds = load_dataset(resolved_csv_path)
-                        ev = evaluate_model(model, ds.texts, ds.labels)
 
-                        preds = model.predict(ds.texts)
-                        prec = _precision_by_class(ds.labels, list(preds))
+                        split = split_train_val_test(
+                            ds.texts,
+                            ds.labels,
+                            random_state=cfg.random_state,
+                            test_size=0.15,
+                            val_size=0.15,
+                        )
+
+                        ev = evaluate_model(model, split.x_test, split.y_test)
+
+                        preds = model.predict(split.x_test)
+                        prec = _precision_by_class(split.y_test, list(preds))
 
                         out_txt = paths.reports_dir / f"{prefix}_metrics.txt"
                         save_text_report(ev, out_txt)
